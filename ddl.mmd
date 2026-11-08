@@ -1,0 +1,33 @@
+erDiagram
+    users {
+        NUMBER id
+        VARCHAR2 username
+        TIMESTAMP created_at
+        %% UNIQUE (username)
+        %% IDENTITY PRIMARY KEY
+    }
+    media_types {
+        NUMBER id
+        VARCHAR2 name
+        TIMESTAMP created_at
+        %% UNIQUE (name)
+        %% IDENTITY PRIMARY KEY
+    }
+    medias {
+        NUMBER id
+        VARCHAR2 title
+        NUMBER media_type_id
+        TIMESTAMP created_at
+        %% UNIQUE (title, media_type_id)
+        %% IDENTITY PRIMARY KEY
+    }
+    users_medias {
+        NUMBER user_id
+        NUMBER media_id
+        TIMESTAMP added_at
+        %% PRIMARY KEY (user_id, media_id)
+    }
+
+    users_medias }o--|| users : "user_id"
+    users_medias }o--|| medias : "media_id"
+    medias }o--|| media_types : "media_type_id"

@@ -1,0 +1,47 @@
+services:
+  dev:
+    image: mcr.microsoft.com/devcontainers/base:bookworm
+    command: sleep infinity
+  # Share Oracle's network stack so the DB is reachable at localhost:1521 even when
+  # Docker Compose service DNS (hostname "oracle") does not resolve from the dev
+  # container (seen with Cursor / Anysphere remote-containers).
+    network_mode: service:oracle
+    environment:
+      ORACLE_CONNECT: media/media@//127.0.0.1:1521/FREEPDB1
+      JAVA_HOME: /usr/lib/jvm/temurin-21-jre
+      SQLCL_HOME: /opt/sqlcl
+      ORACLE_HOME: /opt/oracle/instantclient_23_26
+      LD_LIBRARY_PATH: /opt/oracle/instantclient_23_26
+      PATH: /opt/oracle/instantclient_23_26:/usr/lib/jvm/temurin-21-jre/bin:/opt/sqlcl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      - ..:/workspaces/media-database-oracle:cached
+      - oracle-dev-clients:/opt/oracle
+      - oracle-dev-sqlcl:/opt/sqlcl
+      - oracle-dev-jvm:/usr/lib/jvm/temurin-21-jre
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    environment:
+      ORACLE_PASSWORD: DevContainerAdmin1
+      APP_USER: media
+      APP_USER_PASSWORD: media
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    shm_size: "1gb"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 240s
+
+volumes:
+  oracle-data:
+  oracle-dev-clients:
+  oracle-dev-sqlcl:
+  oracle-dev-jvm:

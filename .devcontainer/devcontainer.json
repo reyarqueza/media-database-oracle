@@ -1,0 +1,23 @@
+{
+  "name": "media-database-oracle",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "runServices": ["oracle"],
+  "workspaceFolder": "/workspaces/media-database-oracle",
+  "forwardPorts": [1521],
+  "portsAttributes": {
+    "1521": {
+      "label": "Oracle Database",
+      "onAutoForward": "ignore"
+    }
+  },
+  "postCreateCommand": "sudo bash .devcontainer/install-clients.sh && . /etc/profile.d/oracle-dev.sh && bash .devcontainer/init-db.sh",
+  "remoteEnv": {
+    "JAVA_HOME": "/usr/lib/jvm/temurin-21-jre",
+    "SQLCL_HOME": "/opt/sqlcl",
+    "ORACLE_HOME": "/opt/oracle/instantclient_23_26",
+    "LD_LIBRARY_PATH": "/opt/oracle/instantclient_23_26",
+    "PATH": "/opt/oracle/instantclient_23_26:/usr/lib/jvm/temurin-21-jre/bin:/opt/sqlcl/bin:${containerEnv:PATH}"
+  },
+  "remoteUser": "vscode"
+}
